@@ -442,7 +442,9 @@ class BlinkDetector(object):
                                    'opening_amplitude',
                                    'closing_amplitude'])
 
-        df.openness_at_peak[df.openness_at_peak < 0] = 0
+        # Fix: Use proper .loc indexing to avoid ChainedAssignmentError (pandas Copy-on-Write)
+        mask = df["openness_at_peak"] < 0
+        df.loc[mask, "openness_at_peak"] = 0
 
         return df, eye_openness_signal_vel
 
