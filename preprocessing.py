@@ -1,6 +1,7 @@
 import numpy as np
 
-#%%
+
+# %%
 def nan_helper(y):
     """Helper to handle indices and logical indices of NaNs.
 
@@ -17,9 +18,11 @@ def nan_helper(y):
     """
 
     return np.isnan(y), lambda z: z.nonzero()[0]
-#%%
+
+
+# %%
 def interpolate_nans(t, y, gap_dur=np.inf):
-    ''' Replaces nans with interpolated values if the 'island' or nans/or gap
+    """Replaces nans with interpolated values if the 'island' or nans/or gap
         is shorter than 'gap_dur'
 
     Args:
@@ -28,7 +31,7 @@ def interpolate_nans(t, y, gap_dur=np.inf):
 
     Returns:
         y - interpolated array
-    '''
+    """
 
     # Find index for nans where gaps are longer than 'gap_dur' samples
     d = np.isnan(y)
@@ -38,9 +41,9 @@ def interpolate_nans(t, y, gap_dur=np.inf):
         return y
 
     # Find onsets and offsets of gaps
-    d = np.diff(np.concatenate((np.array([0]), d*1, np.array([0]))))
-    onsets = np.where(d==1)[0]
-    offsets = np.where(d==-1)[0]
+    d = np.diff(np.concatenate((np.array([0]), d * 1, np.array([0]))))
+    onsets = np.where(d == 1)[0]
+    offsets = np.where(d == -1)[0]
 
     # Decrease offsets come too late by -1
     if np.any(offsets >= len(y)):
@@ -49,14 +52,13 @@ def interpolate_nans(t, y, gap_dur=np.inf):
 
     dur = t[offsets] - t[onsets]
 
-
     # If the gaps are longer than 'gaps', replace temporarily with other values
     for i, on in enumerate(onsets):
         if dur[i] > gap_dur:
-            y[onsets[i]:offsets[i]] = -1000
+            y[onsets[i] : offsets[i]] = -1000
 
     nans, x = nan_helper(y)
-    y[nans]= np.interp(x(nans), x(~nans), y[~nans])
+    y[nans] = np.interp(x(nans), x(~nans), y[~nans])
 
     # put nans back
     y[y == -1000] = np.nan
@@ -64,7 +66,7 @@ def interpolate_nans(t, y, gap_dur=np.inf):
     return y
 
 
-#%%
+# %%
 def nearest_odd_integer(x):
     """Returns nearest odd integer of input value.
 
@@ -79,4 +81,4 @@ def nearest_odd_integer(x):
             5
     """
 
-    return int(2*np.floor(x/2)+1)
+    return int(2 * np.floor(x / 2) + 1)
